@@ -1,14 +1,33 @@
 <!doctype html>
 <html>
   <head>
-    <title>Webpack Package</title>
+    <title>RSS reader</title>
   </head>
   <body>
     <div class="jumbotron">
-      <h1 class="display-4">RSS feeder</h1>
-      <input type="text" name="RSS feed adress" />
-    <a class="btn btn-primary btn-lg" href="#" role="button">Add RSS</a>
-  </p>
-</div>
+      <form id="rss">
+        <h1 class="display-4">RSS reader</h1>
+        <div class="form-group">
+          <label for="input-rss">RSS Feed URL</label>
+          <input name="url" type="text" class="form-control" id="input-rss" placeholder="https://example.com"/>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-rss" disabled>Add feed</button>
+      </form>
+      <p></p>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            RSS Feeds
+            <ul class="list-group" id="rss-feeds">
+            </ul>
+          </div>
+          <div class="col-sm">
+            Posts
+            <ul class="list-group" id="posts">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

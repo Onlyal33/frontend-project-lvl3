@@ -17,6 +17,10 @@ module.exports = {
       },
     ],
   },
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: './dist',
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'template.html',
