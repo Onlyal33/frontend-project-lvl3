@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "dist/index.html", "use": "@now/static" },
+    { "src": "dist/main.js", "use": "@now/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "dist/$1" }
+  ]
+}

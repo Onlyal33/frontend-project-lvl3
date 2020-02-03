@@ -2,3 +2,8 @@
 *.log
 dist
 assets
+.now
+
+# Environment Variables
+.env
+.env.build

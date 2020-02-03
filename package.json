@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "NODE_ENV=production npx webpack",
+    "now-build": "rm -rf dist && mkdir dist && echo 'Custom Build' > ./dist/index.html",
     "start": "webpack-dev-server --open",
     "lint": "npx eslint ."
   },
