@@ -1,13 +1,17 @@
 const parse = (data) => {
   const parser = new DOMParser();
-  const dom = parser.parseFromString(data, 'text/html');
-  const rsstitle = dom.querySelector('title').textContent;
-  const description = dom.querySelector('description').textContent;
-  const posts = Array.from(dom.querySelectorAll('item')).map((el) => {
-    const title = el.querySelector('title').textContent;
-    const link = el.querySelector('guid').textContent;
-    return ({ title, link });
+  const parsedXml = parser.parseFromString(data, 'text/xml');
+  const title = parsedXml.querySelector('title').textContent;
+  const description = parsedXml.querySelector('description').textContent;
+  const items = [...parsedXml.querySelectorAll('item')].map((el) => {
+    const result = {
+      title: el.querySelector('title').textContent,
+      link: el.querySelector('link').textContent,
+      description: el.querySelector('description').textContent,
+    };
+    return result;
   });
-  return { title: rsstitle, description, posts };
+  return { title, description, items };
 };
+
 export default parse;

@@ -1,58 +1,122 @@
+import $ from 'jquery';
+import _ from 'lodash';
+import i18next from 'i18next';
 import isURL from 'validator/lib/isURL';
 import watch from './watcher';
-import getrss from './request';
+import getResponse from './http';
 import parse from './parser';
+import resources from './locales';
 
-const app = () => {
+const addIds = (items, channelId) => items.map((el) => ({ ...el, channelId, id: _.uniqueId() }));
+
+const processError = (args) => {
+  const { error, description, state } = args;
+  state.form.state = 'valid';
+  if (state.errorModal.visibility !== 'shown') {
+    state.errorModal.visibility = 'shown';
+    state.errorModal.description = description;
+  }
+  throw error;
+};
+
+const updateItems = ({ url, id }, state) => getResponse(url)
+  .catch((error) => processError({ error, state, description: 'network' }))
+  .then(({ data }) => {
+    const { items } = parse(data);
+    const existingLinks = state.items.filter(({ channelId }) => channelId === id)
+      .map(({ link }) => link);
+    const filtered = items.filter(({ link }) => !existingLinks.includes(link));
+    const processed = addIds(filtered, id);
+    state.items.unshift(...processed);
+    setTimeout(updateItems, state.updatePeriod, { url, id }, state);
+  })
+  .catch((error) => processError({ error, state, description: 'onItemsUpdate' }));
+
+const run = () => {
   const state = {
-    input: {
-      value: null,
+    form: {
+      input: null,
       state: 'empty',
     },
-    form: 'waiting',
-    feeds: [],
-    posts: [],
+    channels: [],
+    items: [],
+    modal: {
+      activeId: null,
+    },
+    updatePeriod: 5000,
+    errorModal: {
+      visibility: 'hidden',
+      description: null,
+    },
   };
 
-  watch(state);
+  const containers = {
+    input: document.querySelector('input[type="text"]'),
+    button: document.getElementById('submit-rss'),
+    modalBody: $('#showDescModal').find('.modal-body'),
+    form: document.getElementById('rss'),
+    ul: document.getElementById('channels'),
+    table: document.getElementById('items'),
+    errorModal: $('#errorModal'),
+    errorModalDesc: $('#errorDescription'),
+  };
 
-  const input = document.querySelector('input[type="text"]');
-  const form = document.getElementById('rss');
-  const urls = [];
+  watch(state, containers);
 
-  input.addEventListener('input', ({ target }) => {
+  containers.input.addEventListener('input', ({ target }) => {
     const { value } = target;
-    state.input.value = value;
+    state.form.input = value;
     if (value.length === 0) {
-      state.input.state = 'empty';
-    } else if (isURL(value) && !urls.includes(value)) {
-      state.input.state = 'valid';
+      state.form.state = 'empty';
+    } else if (isURL(value) && !state.channels.map(({ url }) => url).includes(value)) {
+      state.form.state = 'valid';
     } else {
-      state.input.state = 'invalid';
+      state.form.state = 'invalid';
     }
   });
 
-  form.addEventListener('submit', (event) => {
+  containers.form.addEventListener('submit', (event) => {
     event.preventDefault();
-    state.form = 'processing';
+    state.form.state = 'processing';
     const formData = new FormData(event.target);
     const url = formData.get('url');
-    const responce = getrss(url);
-    responce.then(({ data }) => {
-      const { title, description, posts } = parse(data);
-      state.feeds.unshift({ title, description, url });
-      urls.push(url);
-      state.posts.unshift(...posts);
-      state.input.value = null;
-      state.form = 'waiting';
-    }).catch(() => {
-      const { value } = input;
-      state.input.value = null;
-      state.form = 'waiting';
-      state.input.value = value;
-      throw new Error('Network problem. Please, try again later.');
-    });
+    getResponse(url)
+      .catch((error) => processError({ error, state, description: 'network' }))
+      .then(({ data }) => {
+        const { title, description, items } = parse(data);
+        const id = state.channels.length;
+        const channel = {
+          title, description, url, id,
+        };
+        state.channels.unshift(channel);
+        const processedItems = addIds(items, id);
+        state.items.unshift(...processedItems);
+        state.form.input = null;
+        state.form.state = 'empty';
+        setTimeout(updateItems, state.updatePeriod, channel, state);
+      })
+      .catch((error) => processError({ error, state, description: 'invalidRss' }));
+  });
+
+  $('#showDescModal').on('show.bs.modal', (event) => {
+    const button = $(event.relatedTarget);
+    const id = button.data('itemid').toString();
+    state.modal.activeId = id;
+  });
+
+  $('#showDescModal').on('hide.bs.modal', () => {
+    state.modal.activeId = null;
+  });
+
+  $('#errorModal').on('hide.bs.modal', () => {
+    state.errorModal.visibility = 'hidden';
+    state.errorModal.description = null;
   });
 };
+
+const app = () => i18next.init({
+  lng: 'en',
+  resources,
+}).then(() => run());
 
 export default app;

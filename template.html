@@ -14,17 +14,48 @@
         <button type="submit" class="btn btn-primary" id="submit-rss" disabled>Add feed</button>
       </form>
       <p></p>
-      <div class="container">
+      <div class="container-fluid">
         <div class="row">
-          <div class="col-sm">
-            RSS Feeds
-            <ul class="list-group" id="rss-feeds">
+          <div class="col">
+            <p class="text-center">Blogs and News Feeds</p>
+            <ul class="list-group" id="channels">
             </ul>
           </div>
-          <div class="col-sm">
-            Posts
-            <ul class="list-group" id="posts">
-            </ul>
+          <div class="col">
+            <p class="text-center">Posts</p>
+              <table class="table table-striped">
+                <tbody id="items">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="showDescModal" tabindex="-1" role="dialog" aria-labelledby="itemDescription" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="itemDescription">Description</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorDescription" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body" id="errorDescription">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
