@@ -5,4 +5,4 @@ RSS reader (Hexlet project)
 ![Node.js CI](https://github.com/Onlyal33/frontend-project-lvl3/workflows/Node.js%20CI/badge.svg)
 
 You can find project's site here:
-https://frontend-project-lvl3-lanvxycvi.now.sh/
+https://frontend-project-lvl3-p12z4grkj.now.sh/
