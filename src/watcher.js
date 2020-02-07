@@ -37,7 +37,7 @@ export default (state, containers) => {
         button.disabled = true;
         break;
       default:
-        throw new Error('unexpected state');
+        throw new Error('Unexpected state of form');
     }
   });
 
@@ -59,7 +59,7 @@ export default (state, containers) => {
         errorModalDesc.html(null);
         break;
       default:
-        throw new Error('unexpected state');
+        throw new Error('Unexpected state of input');
     }
   });
 

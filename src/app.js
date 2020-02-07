@@ -2,35 +2,43 @@ import $ from 'jquery';
 import _ from 'lodash';
 import i18next from 'i18next';
 import isURL from 'validator/lib/isURL';
+import axios from 'axios';
 import watch from './watcher';
-import getResponse from './http';
 import parse from './parser';
 import resources from './locales';
+
+const config = { updatePeriod: 5000, proxyUrl: 'https://cors-anywhere.herokuapp.com/' };
 
 const addIds = (items, channelId) => items.map((el) => ({ ...el, channelId, id: _.uniqueId() }));
 
 const processError = (args) => {
-  const { error, description, state } = args;
-  state.form.state = 'valid';
-  if (state.errorModal.visibility !== 'shown') {
-    state.errorModal.visibility = 'shown';
-    state.errorModal.description = description;
+  const { error, state } = args;
+  if (error.response || error instanceof TypeError) {
+    state.errorModal.description = 'invalidRss';
+  } else {
+    state.errorModal.description = 'network';
   }
-  throw error;
+  state.form.state = 'valid';
+  state.errorModal.visibility = 'shown';
+  console.log(error);
 };
 
-const updateItems = ({ url, id }, state) => getResponse(url)
-  .catch((error) => processError({ error, state, description: 'network' }))
-  .then(({ data }) => {
-    const { items } = parse(data);
-    const existingLinks = state.items.filter(({ channelId }) => channelId === id)
-      .map(({ link }) => link);
-    const filtered = items.filter(({ link }) => !existingLinks.includes(link));
-    const processed = addIds(filtered, id);
-    state.items.unshift(...processed);
-    setTimeout(updateItems, state.updatePeriod, { url, id }, state);
-  })
-  .catch((error) => processError({ error, state, description: 'onItemsUpdate' }));
+const processUrl = (url) => `${config.proxyUrl}${url}`;
+
+const updateItems = ({ url, id }, state) => {
+  const processedUrl = processUrl(url);
+  return axios.get(processedUrl)
+    .then(({ data }) => {
+      const { items } = parse(data);
+      const existingLinks = state.items.filter(({ channelId }) => channelId === id)
+        .map(({ link }) => link);
+      const filtered = items.filter(({ link }) => !existingLinks.includes(link));
+      const processed = addIds(filtered, id);
+      state.items.unshift(...processed);
+      setTimeout(updateItems, state.updatePeriod, { url, id }, state);
+    })
+    .catch((error) => processError({ error, state }));
+};
 
 const run = () => {
   const state = {
@@ -43,7 +51,6 @@ const run = () => {
     modal: {
       activeId: null,
     },
-    updatePeriod: 5000,
     errorModal: {
       visibility: 'hidden',
       description: null,
@@ -80,8 +87,8 @@ const run = () => {
     state.form.state = 'processing';
     const formData = new FormData(event.target);
     const url = formData.get('url');
-    getResponse(url)
-      .catch((error) => processError({ error, state, description: 'network' }))
+    const processedUrl = processUrl(url);
+    axios.get(processedUrl)
       .then(({ data }) => {
         const { title, description, items } = parse(data);
         const id = state.channels.length;
@@ -93,9 +100,9 @@ const run = () => {
         state.items.unshift(...processedItems);
         state.form.input = null;
         state.form.state = 'empty';
-        setTimeout(updateItems, state.updatePeriod, channel, state);
+        setTimeout(updateItems, config.updatePeriod, channel, state);
       })
-      .catch((error) => processError({ error, state, description: 'invalidRss' }));
+      .catch((error) => processError({ error, state }));
   });
 
   $('#showDescModal').on('show.bs.modal', (event) => {
@@ -117,6 +124,6 @@ const run = () => {
 const app = () => i18next.init({
   lng: 'en',
   resources,
-}).then(() => run());
+}).then(run);
 
 export default app;
