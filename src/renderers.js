@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import $ from 'jquery';
 
 const renderChannels = (channels, containers) => {
   const { ul } = containers;
@@ -33,4 +34,25 @@ const renderItems = (items, containers) => {
   });
 };
 
-export { renderItems, renderChannels };
+const renderAlert = (state, containers) => {
+  const { alerts } = containers;
+  const alert = document.createElement('div');
+  alert.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show');
+  alert.setAttribute('role', 'alert');
+  const { error } = state;
+  alert.textContent = i18next.t(`errors.${error[error.length - 1]}`);
+  const button = document.createElement('button');
+  button.classList.add('close');
+  button.setAttribute('type', 'button');
+  button.setAttribute('data-dismiss', 'alert');
+  button.setAttribute('aria-label', 'Close');
+  button.innerHTML = '<span aria-hidden="true">&times;</span>';
+  alert.append(button);
+  $(alert).on('close.bs.alert', () => {
+    state.error.pop();
+  });
+  alerts.innerHTML = '';
+  alerts.append(alert);
+};
+
+export { renderItems, renderChannels, renderAlert };

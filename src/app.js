@@ -14,12 +14,11 @@ const addIds = (items, channelId) => items.map((el) => ({ ...el, channelId, id: 
 const processError = (args) => {
   const { error, state } = args;
   if (error.response || error instanceof TypeError) {
-    state.errorModal.description = 'invalidRss';
+    state.error.push('invalidRss');
   } else {
-    state.errorModal.description = 'network';
+    state.error.push('network');
   }
   state.form.state = 'valid';
-  state.errorModal.visibility = 'shown';
   console.log(error);
 };
 
@@ -35,7 +34,7 @@ const updateItems = ({ url, id }, state) => {
       const filtered = items.filter(({ link }) => !existingLinks.includes(link));
       const processed = addIds(filtered, id);
       state.items.unshift(...processed);
-      setTimeout(updateItems, state.updatePeriod, { url, id }, state);
+      setTimeout(updateItems, config.updatePeriod, { url, id }, state);
     })
     .catch((error) => processError({ error, state }));
 };
@@ -51,21 +50,17 @@ const run = () => {
     modal: {
       activeId: null,
     },
-    errorModal: {
-      visibility: 'hidden',
-      description: null,
-    },
+    errors: [],
   };
 
   const containers = {
     input: document.querySelector('input[type="text"]'),
     button: document.getElementById('submit-rss'),
     modalBody: $('#showDescModal').find('.modal-body'),
+    alerts: document.getElementById('alerts'),
     form: document.getElementById('rss'),
     ul: document.getElementById('channels'),
     table: document.getElementById('items'),
-    errorModal: $('#errorModal'),
-    errorModalDesc: $('#errorDescription'),
   };
 
   watch(state, containers);
@@ -113,11 +108,6 @@ const run = () => {
 
   $('#showDescModal').on('hide.bs.modal', () => {
     state.modal.activeId = null;
-  });
-
-  $('#errorModal').on('hide.bs.modal', () => {
-    state.errorModal.visibility = 'hidden';
-    state.errorModal.description = null;
   });
 };
 

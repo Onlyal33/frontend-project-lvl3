@@ -5,14 +5,24 @@
   </head>
   <body>
     <div class="jumbotron">
-      <form id="rss">
-        <h1 class="display-4">RSS reader</h1>
-        <div class="form-group">
-          <label for="input-rss">RSS Feed URL</label>
-          <input name="url" type="text" class="form-control" id="input-rss" placeholder="https://example.com"/>
+      <div>
+        <form id="rss">
+          <h1 class="display-4">RSS reader</h1>
+          <div class="form-group row">
+              <label for="input-rss" class="col-sm-2 col-form-label">RSS Feed URL</label>
+              <div class="col-sm-10">
+                <input name="url" type="text" class="form-control" id="input-rss" placeholder="Enter url: https://example.com/rss.xml"/>
+              </div>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary" id="submit-rss" disabled>Add feed</button>
+            </div>
+          </div>
+        </form>
+        <p></p>
+        <div id="alerts">
         </div>
-        <button type="submit" class="btn btn-primary" id="submit-rss" disabled>Add feed</button>
-      </form>
+      </div>
       <p></p>
       <div class="container-fluid">
         <div class="row">

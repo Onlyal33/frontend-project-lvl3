@@ -1,15 +1,12 @@
 import { watch } from 'melanke-watchjs';
 import _ from 'lodash';
-import i18next from 'i18next';
-import { renderChannels, renderItems } from './renderers';
+import { renderChannels, renderItems, renderAlert } from './renderers';
 
 export default (state, containers) => {
   const {
     input,
     button,
     modalBody,
-    errorModal,
-    errorModalDesc,
   } = containers;
 
   watch(state, 'form', () => {
@@ -49,17 +46,9 @@ export default (state, containers) => {
     renderItems(state.items, containers);
   });
 
-  watch(state, 'errorModal', () => {
-    switch (state.errorModal.visibility) {
-      case 'shown':
-        errorModalDesc.html(i18next.t(`errors.${state.errorModal.description}`));
-        errorModal.modal('show');
-        break;
-      case 'hidden':
-        errorModalDesc.html(null);
-        break;
-      default:
-        throw new Error('Unexpected state of input');
+  watch(state, 'error', () => {
+    if (state.error.length) {
+      renderAlert(state, containers);
     }
   });
 
