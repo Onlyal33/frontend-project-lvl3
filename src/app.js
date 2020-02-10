@@ -50,7 +50,6 @@ const run = () => {
       state: 'hidden',
       activeId: null,
     },
-    responseState: 'error-free',
     errors: [],
   };
 
