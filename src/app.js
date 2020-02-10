@@ -14,26 +14,25 @@ const addIds = (items, channelId) => items.map((el) => ({ ...el, channelId, id: 
 const processError = (args) => {
   const { error, state } = args;
   if (error.response || error instanceof TypeError) {
-    state.error.push('invalidRss');
+    state.errors.push({ id: _.uniqueId(), type: 'invalidRss' });
   } else {
-    state.error.push('network');
+    state.errors.push({ id: _.uniqueId(), type: 'network' });
   }
   state.form.state = 'valid';
   console.log(error);
 };
 
-const processUrl = (url) => `${config.proxyUrl}${url}`;
+const prependProxyToUrl = (url) => `${config.proxyUrl}${url}`;
 
 const updateItems = ({ url, id }, state) => {
-  const processedUrl = processUrl(url);
+  const processedUrl = prependProxyToUrl(url);
   return axios.get(processedUrl)
     .then(({ data }) => {
       const { items } = parse(data);
-      const existingLinks = state.items.filter(({ channelId }) => channelId === id)
-        .map(({ link }) => link);
-      const filtered = items.filter(({ link }) => !existingLinks.includes(link));
-      const processed = addIds(filtered, id);
-      state.items.unshift(...processed);
+      const existingItems = state.items.filter(({ channelId }) => channelId === id);
+      const newItems = _.differenceBy(items, existingItems, 'link');
+      const processedItems = addIds(newItems, id);
+      state.items.unshift(...processedItems);
       setTimeout(updateItems, config.updatePeriod, { url, id }, state);
     })
     .catch((error) => processError({ error, state }));
@@ -48,8 +47,10 @@ const run = () => {
     channels: [],
     items: [],
     modal: {
+      state: 'hidden',
       activeId: null,
     },
+    responseState: 'error-free',
     errors: [],
   };
 
@@ -82,7 +83,7 @@ const run = () => {
     state.form.state = 'processing';
     const formData = new FormData(event.target);
     const url = formData.get('url');
-    const processedUrl = processUrl(url);
+    const processedUrl = prependProxyToUrl(url);
     axios.get(processedUrl)
       .then(({ data }) => {
         const { title, description, items } = parse(data);
@@ -103,11 +104,14 @@ const run = () => {
   $('#showDescModal').on('show.bs.modal', (event) => {
     const button = $(event.relatedTarget);
     const id = button.data('itemid').toString();
-    state.modal.activeId = id;
+    const { description } = _.find(state.items, { id });
+    state.modal.description = description;
+    state.modal.state = 'shown';
   });
 
   $('#showDescModal').on('hide.bs.modal', () => {
-    state.modal.activeId = null;
+    state.modal.description = null;
+    state.modal.state = 'hidden';
   });
 };
 
