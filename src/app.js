@@ -7,7 +7,7 @@ import watch from './watcher';
 import parse from './parser';
 import resources from './locales';
 
-const config = { updatePeriod: 5000, proxyUrl: 'https://cors-anywhere.herokuapp.com/' };
+const config = { updatePeriod: 5000, proxyUrl: 'https://allorigins.hexlet.app/raw?disableCache=true&url=' };
 
 const addIds = (items, channelId) => items.map((el) => ({ ...el, channelId, id: _.uniqueId() }));
 
@@ -22,7 +22,7 @@ const processError = (args) => {
   console.log(error);
 };
 
-const prependProxyToUrl = (url) => `${config.proxyUrl}${url}`;
+const prependProxyToUrl = (url) => `${config.proxyUrl}${encodeURIComponent(url)}`;
 
 const updateItems = ({ url, id }, state) => {
   const processedUrl = prependProxyToUrl(url);
