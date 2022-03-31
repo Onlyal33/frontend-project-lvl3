@@ -54,7 +54,7 @@ const run = () => {
   };
 
   const containers = {
-    input: document.querySelector('input[type="text"]'),
+    input: document.getElementById('input-rss'),
     button: document.getElementById('submit-rss'),
     modalBody: $('#showDescModal').find('.modal-body'),
     alerts: document.getElementById('alerts'),
