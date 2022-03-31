@@ -1,14 +1,14 @@
 install: install-deps
 
 develop:
-	npx webpack-dev-server
+	npm run start
 
 install-deps:
 	npm install
 
 build:
-	rm -rf dist
-	NODE_ENV=production npx webpack
+	npm run prebuild
+	npm run build
 
 lint:
 	npx eslint .
