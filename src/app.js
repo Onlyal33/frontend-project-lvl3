@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import i18next from 'i18next';
-import isURL from 'validator/lib/isURL';
+import isURL from 'validator/lib/isURL.js';
 import axios from 'axios';
-import watch from './watcher';
-import parse from './parser';
-import resources from './locales';
+import watch from './watcher.js';
+import parse from './parser.js';
+import resources from './locales/index.js';
 
 const config = { updatePeriod: 5000, proxyUrl: 'https://allorigins.hexlet.app/raw?disableCache=true&url=' };
 

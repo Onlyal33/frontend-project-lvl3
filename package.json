@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "rss-feeder",
   "main": "src/index.js",
+  "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
     "prebuild": "rm -rf dist",
-    "build": "webpack --config webpack.prod.js",
-    "start": "webpack serve --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.cjs",
+    "start": "webpack serve --open --config webpack.dev.cjs",
     "lint": "npx eslint ."
   },
   "repository": {

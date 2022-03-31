@@ -1,5 +1,5 @@
 import { watch } from 'melanke-watchjs';
-import { renderChannels, renderItems, renderAlerts } from './renderers';
+import { renderChannels, renderItems, renderAlerts } from './renderers.js';
 
 export default (state, containers) => {
   const {
