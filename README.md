@@ -2,7 +2,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/1471728a3f268351cbea/maintainability)](https://codeclimate.com/github/Onlyal33/frontend-project-lvl3/maintainability)
 
-![Node.js CI](https://github.com/Onlyal33/frontend-project-lvl3/workflows/Node.js%20CI/badge.svg)
+[![Github Actions Status](https://github.com/Onlyal33/frontend-project-lvl3/workflows/Node%20CI/badge.svg)](https://github.com/Onlyal33/frontend-project-lvl3/actions)
 
 You would be able to add valid feeds to your feed list, receive regular updates and read posts
 
